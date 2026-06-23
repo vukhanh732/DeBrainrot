@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useTransition } from 'react'
+import { useState, useEffect, useTransition, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -20,11 +20,7 @@ export function Leaderboard({ mode = 'arithmetic' }: LeaderboardProps) {
   const [loading, setLoading] = useState(true)
   const [isPending, startTransition] = useTransition()
 
-  useEffect(() => {
-    loadEntries()
-  }, [timeframe, mode]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  async function loadEntries() {
+  const loadEntries = useCallback(async () => {
     setLoading(true)
     const supabase = createClient()
 
@@ -55,7 +51,12 @@ export function Leaderboard({ mode = 'arithmetic' }: LeaderboardProps) {
     }))
 
     setEntries(ranked)
-  }
+  }, [timeframe, mode])
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadEntries()
+  }, [loadEntries])
 
   function switchTimeframe(t: Timeframe) {
     startTransition(() => setTimeframe(t))

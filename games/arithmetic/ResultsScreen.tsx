@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import confetti from 'canvas-confetti'
 import { motion } from 'framer-motion'
 import { Trophy, Target, Zap, RefreshCw, Settings } from 'lucide-react'
@@ -29,14 +29,7 @@ export function ResultsScreen({ result, onPlayAgain, onChangeConfig }: ResultsSc
   const [authOpen, setAuthOpen] = useState(false)
   const hasSaved = useRef(false)
 
-  useEffect(() => {
-    if (hasSaved.current) return
-    hasSaved.current = true
-    if (!user) return
-    saveScore()
-  }, [user]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  async function saveScore() {
+  const saveScore = useCallback(async () => {
     setSaving(true)
     try {
       const res = await fetch('/api/scores', {
@@ -64,7 +57,15 @@ export function ResultsScreen({ result, onPlayAgain, onChangeConfig }: ResultsSc
     } finally {
       setSaving(false)
     }
-  }
+  }, [result])
+
+  useEffect(() => {
+    if (hasSaved.current) return
+    hasSaved.current = true
+    if (!user) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    saveScore()
+  }, [user, saveScore])
 
   const stats = [
     { icon: Trophy, label: 'Score', value: result.score, color: 'text-yellow-500' },

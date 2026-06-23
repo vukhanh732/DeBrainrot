@@ -20,10 +20,19 @@ export function GameScreen({ config, onFinish }: GameScreenProps) {
   const [shake, setShake] = useState(false)
   const [problemKey, setProblemKey] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
-  const startTime = useRef(Date.now())
+  const startTime = useRef<number>(0)
   const gameOver = useRef(false)
+  const scoreRef = useRef(0)
+  const attemptsRef = useRef(0)
 
-  useEffect(() => { inputRef.current?.focus() }, [])
+  useEffect(() => {
+    startTime.current = Date.now()
+    inputRef.current?.focus()
+  }, [])
+
+  // Keep refs in sync with state for use in the finish callback
+  useEffect(() => { scoreRef.current = score }, [score])
+  useEffect(() => { attemptsRef.current = totalAttempts }, [totalAttempts])
 
   const finishGame = useCallback(async (finalScore: number, finalAttempts: number) => {
     if (gameOver.current) return
@@ -41,7 +50,6 @@ export function GameScreen({ config, onFinish }: GameScreenProps) {
   }, [config, onFinish])
 
   useEffect(() => {
-    if (timeLeft <= 0) return
     const id = setInterval(() => {
       setTimeLeft(t => {
         if (t <= 1) { clearInterval(id); return 0 }
@@ -50,12 +58,6 @@ export function GameScreen({ config, onFinish }: GameScreenProps) {
     }, 1000)
     return () => clearInterval(id)
   }, [])
-
-  // Use refs to capture latest score/attempts for the finish callback
-  const scoreRef = useRef(0)
-  const attemptsRef = useRef(0)
-  scoreRef.current = score
-  attemptsRef.current = totalAttempts
 
   useEffect(() => {
     if (timeLeft === 0) finishGame(scoreRef.current, attemptsRef.current)
@@ -66,10 +68,8 @@ export function GameScreen({ config, onFinish }: GameScreenProps) {
     setInput(value)
     if (!value) return
     if (checkAnswer(problem, value)) {
-      const newScore = score + 1
-      const newAttempts = totalAttempts + 1
-      setScore(newScore)
-      setTotalAttempts(newAttempts)
+      setScore(s => s + 1)
+      setTotalAttempts(t => t + 1)
       setInput('')
       setProblem(generateProblem(config))
       setProblemKey(k => k + 1)
