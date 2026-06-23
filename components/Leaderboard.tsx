@@ -24,12 +24,13 @@ export function Leaderboard({ mode = 'arithmetic' }: LeaderboardProps) {
     setLoading(true)
     const supabase = createClient()
 
+    // Fetch all scores for the filter, then deduplicate to keep each user's best
     let query = supabase
       .from('scores')
-      .select('score, created_at, profiles(username)')
+      .select('score, created_at, user_id, profiles(username)')
       .eq('mode', mode)
       .order('score', { ascending: false })
-      .limit(50)
+      .limit(500)
 
     if (timeframe === 'today') {
       const today = new Date()
@@ -42,7 +43,15 @@ export function Leaderboard({ mode = 'arithmetic' }: LeaderboardProps) {
 
     if (error || !data) return
 
-    const ranked: LeaderboardEntry[] = data.map((row, idx) => ({
+    // One entry per user — first occurrence is their best (already ordered desc)
+    const seen = new Set<string>()
+    const deduped = data.filter(row => {
+      if (seen.has(row.user_id)) return false
+      seen.add(row.user_id)
+      return true
+    })
+
+    const ranked: LeaderboardEntry[] = deduped.slice(0, 50).map((row, idx) => ({
       rank: idx + 1,
       // @ts-expect-error — Supabase join typing is complex
       username: row.profiles?.username ?? null,
@@ -54,8 +63,7 @@ export function Leaderboard({ mode = 'arithmetic' }: LeaderboardProps) {
   }, [timeframe, mode])
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadEntries()
+    loadEntries() // eslint-disable-line react-hooks/set-state-in-effect
   }, [loadEntries])
 
   function switchTimeframe(t: Timeframe) {

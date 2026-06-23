@@ -61,8 +61,8 @@ export function ResultsScreen({ result, onPlayAgain, onChangeConfig }: ResultsSc
 
   useEffect(() => {
     if (hasSaved.current) return
-    hasSaved.current = true
     if (!user) return
+    hasSaved.current = true
     // eslint-disable-next-line react-hooks/set-state-in-effect
     saveScore()
   }, [user, saveScore])

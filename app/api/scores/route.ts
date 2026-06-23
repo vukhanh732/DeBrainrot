@@ -28,7 +28,8 @@ export async function POST(request: NextRequest) {
 
   const { mode, configHash, score, accuracy, metadata } = body
 
-  if (typeof mode !== 'string' || !mode) {
+  const ALLOWED_MODES = ['arithmetic'] as const
+  if (!ALLOWED_MODES.includes(mode as typeof ALLOWED_MODES[number])) {
     return NextResponse.json({ error: 'Invalid mode' }, { status: 400 })
   }
   if (typeof configHash !== 'string' || !/^[a-f0-9]{64}$/.test(configHash)) {
