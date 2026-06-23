@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DeBrainRot
 
-## Getting Started
+Free mental-math and brain-training web app. Cheeky tone, fast gameplay, fair leaderboards.
 
-First, run the development server:
+## Setup
+
+### 1. Clone and install
+
+```bash
+git clone <repo-url>
+cd DeBrainRot
+npm install
+```
+
+### 2. Environment variables
+
+Copy `.env.local.example` to `.env.local` and fill in your Supabase credentials:
+
+```bash
+cp .env.local.example .env.local
+```
+
+### 3. Supabase setup
+
+1. Create a project at https://supabase.com
+2. Run the SQL in `docs/superpowers/specs/2026-06-24-debrainrot-phase1-design.md` (section 3) in the SQL Editor
+3. Enable Google OAuth: Authentication → Providers → Google → toggle on
+4. Set the redirect URL to `https://<your-project>.supabase.co/auth/v1/callback`
+5. Add `http://localhost:3000/api/auth/callback` to Authentication → URL Configuration → Redirect URLs
+
+### 4. Run locally
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 5. Deploy to Vercel
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npx vercel
+```
 
-## Learn More
+Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` as environment variables in the Vercel dashboard.
 
-To learn more about Next.js, take a look at the following resources:
+## Tech Stack
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Next.js 16 (App Router) + TypeScript strict
+- Tailwind CSS 4 + shadcn/ui
+- Supabase (auth + Postgres)
+- framer-motion, canvas-confetti, lucide-react
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Game Modes (Phase 1)
 
-## Deploy on Vercel
+- **Arithmetic Sprint** — Zetamac-style: race against a timer, auto-advance on correct answer
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Development
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run dev      # start dev server
+npm run build    # production build
+npm run lint     # ESLint
+npm test         # Vitest unit tests
+```
