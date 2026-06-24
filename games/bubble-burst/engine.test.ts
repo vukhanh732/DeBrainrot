@@ -18,6 +18,11 @@ describe('generateWave', () => {
     expect(wave5.bubbles.length).toBeGreaterThan(wave1.bubbles.length)
   })
 
+  it('wave 3 has 2 correct bubbles', () => {
+    const wave = generateWave(3)
+    expect(wave.bubbles.filter(b => b.isCorrect)).toHaveLength(2)
+  })
+
   it('wave 5 has 2 correct bubbles', () => {
     const wave = generateWave(5)
     expect(wave.bubbles.filter(b => b.isCorrect)).toHaveLength(2)

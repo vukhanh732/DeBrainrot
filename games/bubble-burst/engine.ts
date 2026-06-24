@@ -35,7 +35,7 @@ function getBubbleCount(waveNumber: number): number {
 
 function getCorrectCount(waveNumber: number): number {
   // Wave 1-2: 1 correct; +1 every 3 waves
-  return 1 + Math.floor((waveNumber - 1) / 3)
+  return 1 + Math.floor(waveNumber / 3)
 }
 
 function getFloatDuration(waveNumber: number): number {
