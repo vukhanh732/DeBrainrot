@@ -16,21 +16,24 @@ const GAME_MODES = [
     description: 'Tap the correct answer before bubbles float away.',
     icon: Circle,
     href: '/play/bubble-burst',
-    available: false,
+    available: true,
+    badge: 'Play Now',
   },
   {
     title: 'Falling Equations',
     description: 'Type answers before equation blocks hit the floor.',
     icon: Layers,
     href: '/play/falling-equations',
-    available: false,
+    available: true,
+    badge: 'Play Now',
   },
   {
     title: 'Number Hunt',
     description: 'Find all the numbers matching the rule before time runs out.',
     icon: Grid3X3,
     href: '/play/number-hunt',
-    available: false,
+    available: true,
+    badge: 'Play Now',
   },
 ]
 

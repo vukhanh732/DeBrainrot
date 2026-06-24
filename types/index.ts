@@ -1,4 +1,4 @@
-export type GameMode = 'arithmetic'
+export type GameMode = 'arithmetic' | 'bubble-burst' | 'falling-equations' | 'number-hunt'
 
 export type Operation = 'add' | 'subtract' | 'multiply' | 'divide'
 
@@ -28,7 +28,7 @@ export interface GameResult {
   totalAttempts: number
   accuracy: number
   problemsPerMinute: number
-  duration: 30 | 60 | 120
+  duration: number
   configHash: string
 }
 

@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
 
   const { mode, configHash, score, accuracy, metadata } = body
 
-  const ALLOWED_MODES = ['arithmetic'] as const
+  const ALLOWED_MODES = ['arithmetic', 'bubble-burst', 'falling-equations', 'number-hunt'] as const
   if (!ALLOWED_MODES.includes(mode as typeof ALLOWED_MODES[number])) {
     return NextResponse.json({ error: 'Invalid mode' }, { status: 400 })
   }
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
   }
 
   const duration = typeof metadata?.duration === 'number' ? metadata.duration : 0
-  if (mode === 'arithmetic' && !isScorePlausible('arithmetic', duration, score)) {
+  if (!isScorePlausible(mode, duration, score)) {
     return NextResponse.json({ error: 'Score rejected: implausible result' }, { status: 400 })
   }
 
