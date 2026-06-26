@@ -24,7 +24,21 @@ export function Leaderboard({ mode = 'arithmetic' }: LeaderboardProps) {
     setLoading(true)
     const supabase = createClient()
 
-    // Fetch all scores for the filter, then deduplicate to keep each user's best
+    if (mode === 'combined') {
+      const { data, error } = await supabase.rpc('get_combined_scores', { p_limit: 50 })
+      setLoading(false)
+      if (error || !data) return
+      const ranked: LeaderboardEntry[] = (data as Array<{ username: string | null; total_score: number }>)
+        .map((row, idx) => ({
+          rank: idx + 1,
+          username: row.username ?? null,
+          score: Number(row.total_score),
+          createdAt: '',
+        }))
+      setEntries(ranked)
+      return
+    }
+
     let query = supabase
       .from('scores')
       .select('score, created_at, user_id, profiles(username)')
@@ -43,7 +57,6 @@ export function Leaderboard({ mode = 'arithmetic' }: LeaderboardProps) {
 
     if (error || !data) return
 
-    // One entry per user — first occurrence is their best (already ordered desc)
     const seen = new Set<string>()
     const deduped = data.filter(row => {
       if (seen.has(row.user_id)) return false
@@ -85,23 +98,25 @@ export function Leaderboard({ mode = 'arithmetic' }: LeaderboardProps) {
             <Trophy className="h-5 w-5 text-yellow-500" />
             Leaderboard
           </CardTitle>
-          <div className="flex gap-1">
-            {(['today', 'alltime'] as Timeframe[]).map(t => (
-              <button
-                key={t}
-                onClick={() => switchTimeframe(t)}
-                className={`
-                  px-3 py-1 rounded-lg text-sm font-medium transition-colors min-h-[32px]
-                  ${timeframe === t
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                  }
-                `}
-              >
-                {t === 'today' ? 'Today' : 'All Time'}
-              </button>
-            ))}
-          </div>
+          {mode !== 'combined' && (
+            <div className="flex gap-1">
+              {(['today', 'alltime'] as Timeframe[]).map(t => (
+                <button
+                  key={t}
+                  onClick={() => switchTimeframe(t)}
+                  className={`
+                    px-3 py-1 rounded-lg text-sm font-medium transition-colors min-h-[32px]
+                    ${timeframe === t
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                    }
+                  `}
+                >
+                  {t === 'today' ? 'Today' : 'All Time'}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </CardHeader>
 
