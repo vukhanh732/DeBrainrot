@@ -14,7 +14,7 @@ describe('generateGrid', () => {
 
   it('does not have all 25 numbers correct', () => {
     const grid = generateGrid(1)
-    expect(grid.correctIndices.size).toBeLessThan(25)
+    expect(grid.correctIndices.size).toBeLessThanOrEqual(20)
   })
 
   it('correctIndices match the rule', () => {
