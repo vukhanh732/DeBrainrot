@@ -49,10 +49,11 @@ export function GameScreen({ onFinish }: GameScreenProps) {
   // Spawn blocks based on level
   const spawnBlock = useCallback(() => {
     const level = getLevel(correctRef.current)
+    const count = getEquationCount(level)
     setBlocks(prev => {
-      const count = getEquationCount(level)
       if (prev.length >= count) return prev
-      return [...prev, generateBlock(level)]
+      const lane = prev.length  // next lane index
+      return [...prev, generateBlock(level, lane)]
     })
   }, [])
 
@@ -87,19 +88,19 @@ export function GameScreen({ onFinish }: GameScreenProps) {
   }, [blocks, finishGame, spawnBlock])
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key !== 'Enter' || !input) return
+    if (e.key !== 'Enter' || !input.trim()) return
+    if (blocks.length === 0) return
 
     totalAttemptsRef.current += 1
-    const activeBlock = blocks[0]
-    if (!activeBlock) return
-
     const parsed = parseInt(input, 10)
-    if (!isNaN(parsed) && parsed === activeBlock.problem.answer) {
-      const pts = scoreBlockAnswer(activeBlock, Date.now())
+    const matchedBlock = blocks.find(b => !isNaN(parsed) && parsed === b.problem.answer)
+
+    if (matchedBlock) {
+      const pts = scoreBlockAnswer(matchedBlock, Date.now())
       setScore(s => s + pts)
       setCorrectCount(c => c + 1)
       setInput('')
-      setBlocks(prev => prev.filter(b => b.id !== activeBlock.id))
+      setBlocks(prev => prev.filter(b => b.id !== matchedBlock.id))
       spawnBlock()
     } else {
       setShake(true)
@@ -140,8 +141,11 @@ export function GameScreen({ onFinish }: GameScreenProps) {
                 initial={{ y: '0%' }}
                 animate={{ y: '82%' }}
                 transition={{ duration: block.fallDuration / 1000, ease: 'linear' }}
-                className="absolute left-1/2 -translate-x-1/2 bg-card border-2 border-primary rounded-xl px-6 py-3 text-2xl font-bold text-center shadow-md"
-                style={{ top: 0 }}
+                className="absolute bg-card border-2 border-primary rounded-xl px-6 py-3 text-2xl font-bold text-center shadow-md"
+                style={{
+                  width: '45%',
+                  left: block.lane === 0 ? '2.5%' : '52.5%',
+                }}
               >
                 {block.problem.display} = ?
               </motion.div>

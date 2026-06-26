@@ -7,6 +7,7 @@ export interface FallingBlock {
   problem: Problem
   spawnTime: number
   fallDuration: number
+  lane: number  // 0 = left-center, 1 = right-center (for 2-block levels)
 }
 
 export const FALLING_EQUATIONS_CONFIG_HASH: Promise<string> = hashConfig({
@@ -38,7 +39,7 @@ function getRange(level: number): { min: number; max: number } {
   return { min: 1, max }
 }
 
-export function generateBlock(level: number): FallingBlock {
+export function generateBlock(level: number, lane: number = 0): FallingBlock {
   const range = getRange(level)
   const problem = generateProblem({
     operations: ['add', 'subtract', 'multiply'],
@@ -55,6 +56,7 @@ export function generateBlock(level: number): FallingBlock {
     problem,
     spawnTime: Date.now(),
     fallDuration: getFallDuration(level),
+    lane,
   }
 }
 

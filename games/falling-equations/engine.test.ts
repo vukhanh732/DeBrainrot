@@ -38,11 +38,17 @@ describe('generateBlock', () => {
     expect(block.problem).toBeDefined()
     expect(block.problem.answer).toBeTypeOf('number')
     expect(block.fallDuration).toBe(getFallDuration(1))
+    expect(block.lane).toBe(0)
   })
 
   it('uses level-appropriate fall duration', () => {
     const block5 = generateBlock(5)
     expect(block5.fallDuration).toBe(getFallDuration(5))
+  })
+
+  it('assigns lane correctly', () => {
+    expect(generateBlock(1, 0).lane).toBe(0)
+    expect(generateBlock(1, 1).lane).toBe(1)
   })
 })
 
