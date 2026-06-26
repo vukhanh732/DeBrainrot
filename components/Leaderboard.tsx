@@ -27,7 +27,10 @@ export function Leaderboard({ mode = 'arithmetic' }: LeaderboardProps) {
     if (mode === 'combined') {
       const { data, error } = await supabase.rpc('get_combined_scores', { p_limit: 50 })
       setLoading(false)
-      if (error || !data) return
+      if (error || !data) {
+        setEntries([])
+        return
+      }
       const ranked: LeaderboardEntry[] = (data as Array<{ username: string | null; total_score: number }>)
         .map((row, idx) => ({
           rank: idx + 1,
